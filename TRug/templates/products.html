@@ -1,0 +1,34 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Продукция{% endblock %}
+
+{% block content %}
+<h2>Продукция</h2>
+<table class="product-table">
+<thead>
+    <tr>
+        <th>Название</th>
+        <th>Тип продукции</th>
+        <th>Описание</th>
+        <th>Цена</th>
+        <th>Количество</th>
+        <th>Обновлено</th>
+        <th>Создано</th>
+    </tr>
+</thead>
+<tbody>
+    {% for product in products %}
+    <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.product_type }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.updated }}</td>
+        <td>{{ product.created }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+{% endblock %}

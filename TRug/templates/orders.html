@@ -1,0 +1,147 @@
+{% extends 'home.html' %}
+{% load static %}
+{% block title %}Заказы{% endblock %}
+
+{% block content %}
+<h2>Заказы</h2>
+
+<script src="{% static 'scripts/order.js' %}"></script>
+
+<div class="buttons">
+    <button id="add-order-button" class="icon-button">
+        <img src="{% static 'images/add.svg' %}" alt="Добавить заказ">
+        <span class="button-label">Добавить заказ</span>
+    </button>
+   <button id="delete-order-button" class="icon-button" onclick="deleteSelectedOrders()">
+    <img src="{% static 'images/delete.svg' %}" alt="Удалить заказ">
+    <span class="button-label">Удалить выбранные заказы</span>
+    </button>
+    </a>
+    <button id="edit-order-button" class="icon-button" onclick="editSelectedOrder()">
+        <img src="{% static 'images/change.svg' %}" alt="Изменить заказ">
+        <span class="button-label">Изменить выбранный заказ</span>
+    </button>
+    <a href="{% url 'generate_invoice' %}" class="icon-button">
+        <img src="{% static 'images/excel.svg' %}" alt="Сформировать накладную">
+         <span class="button-label">Сформировать накладную</span>
+    </a>
+</div>
+
+<table class="order-table" id = order-table>
+    <thead>
+        <tr>
+            <th>Выбрать</th>
+            <th>Клиент</th>
+            <th>Продукция</th>
+            <th>Кол-во продукции</th>
+            <th>Сумма заказа</th>
+            <th>Дата заказа</th>
+            <th>Выполнен</th>
+        </tr>
+    </thead>
+    <tbody id="order-table-body">
+        {% for order in orders %}
+            <tr>
+                <td style="text-align: center;"><input type="checkbox" class="checkbox-custom" name="selected_order" value="{{ order.id }}"></td>
+                <td>{{ order.customer }}</td>
+                <td class="text2">
+                    {% for order_product in order.products.all %}
+                        <p>{{ order_product.product.name }}</p>
+                    {% endfor %}
+                </td>
+                <td class="text2">
+                    {% for order_product in order.products.all %}
+                        <p class="text2">{{ order_product.quantity }}</p>
+                    {% endfor %}
+                </td>
+                <td>{{ order.summary }}.руб</td>
+                <td>{{ order.date_ordered }}</td>
+                {% if order.completed %}
+                    <td><img src="{% static 'images/check.svg' %}" alt="Completed"></td>
+                {% else %}
+                    <td><img src="{% static 'images/cross.svg' %}" alt="Not Completed"></td>
+                {% endif %}
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7">Нет данных о заказах</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    // Передаем данные о продуктах из Django в JavaScript
+    var productsData = {{ products | safe }}
+
+    // Проверяем, что данные загружены
+    if (!Array.isArray(productsData) || productsData.length === 0) {
+        console.error('Ошибка: данные о продуктах не загружены или пустой массив.');
+    }
+</script>
+
+<div id="add-order-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Добавление заказа</h3>
+        <form id="add-order-form" action="{% url 'create_order' %}" method="post" data-create-order-url="{% url 'create_order' %}">
+            {% csrf_token %}
+            <label for="customer">Клиент:</label>
+            <input type="text" id="customer" name="customer" required>
+            <div id="order-products">
+                <label for="products_product[]">Выберите продукцию:</label>
+                <div id="product-fields">
+                    <div class="product-field">
+                        <select name="products_product" required>
+                            {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="product_quantities">Количество:</label>
+                        <input type="number" name="product_quantities" min="1" required>
+                        <button type="button" class="remove-product">Удалить</button>
+                    </div>
+                </div>
+                <button type="button" id="add-product">Добавить продукцию</button>
+            </div>
+
+            <label for="date_ordered">Дата заказа:</label>
+            <input type="date" id="date_ordered" name="date_ordered" required>
+
+            <button type="submit">Добавить заказ</button>
+        </form>
+    </div>
+</div>
+
+<div id="edit-order-modal" class="modal">
+    <div class="modal-content">
+        <h3>Редактировать заказ</h3>
+        <form id="edit-order-form">
+            {% csrf_token %}
+            <input type="hidden" id="edit-order-id">
+            <label for="edit-order-summary">Продукция</label>
+            <input type="text" id="edit-order-summary" name="summary">
+            <label for="edit-order-date">Дата заказа:</label>
+            <input type="date" id="edit-order-date" name="date_ordered">
+            <!-- Поля для редактирования продуктов -->
+            <div id="edit-order-products">
+
+            </div>
+                <!-- Элементы продуктов будут добавляться динамически -->
+            <button type="button" id="add-edit-product">Добавить продукцию</button>
+            <button type="button" onclick="submitEditOrderForm()">Сохранить</button>
+            <button type="button" onclick="closeEditOrderModal()">Отмена</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- Popup window for status messages -->
+<div id="popup-status" class="popup-status"></div>
+
+<!-- Всплывающее окно об удалении -->
+<div id="popup" class="popup">
+    <span class="popup-message" id="popup-message"></span>
+</div>
+
+{% endblock %}

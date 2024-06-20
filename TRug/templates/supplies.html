@@ -1,0 +1,44 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Поставки{% endblock %}
+
+{% block content %}
+<h2>Поставки</h2>
+<table class="supplies-table">
+<thead>
+<tr>
+    <th>Поставщик</th>
+    <th>Продукты</th>
+    <th>Количество продуктов</th>
+    <th>Количество поставок</th>
+    <th>Дата поставки</th>
+</tr>
+</thead>
+<tbody>
+{% for supply in supplies %}
+<tr>
+    <td>{{ supply.supplier }}</td>
+    <td class="text2">
+        {% for supplies_product in supplies_products.all %}
+            <p>{{ supplies_product.product.name }}</p>
+        {% endfor %}
+    </td>
+
+    <td class="text2">
+        {% for supplies_product in supplies_products.all %}
+            <p>{{ supplies_product.quantity }}</p>
+        {% endfor %}
+    </td>
+
+    <td>{{ supply.quantity }}</td>
+    <td>{{ supply.date_supplied }}</td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4">Нет данных о поставках</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

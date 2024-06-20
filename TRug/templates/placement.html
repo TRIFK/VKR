@@ -1,0 +1,36 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Размещение продукции{% endblock %}
+
+{% block content %}
+    <h2>Размещение продукции</h2>
+    <table class="placement-table">
+        <thead>
+            <tr>
+                <th>Локация</th>
+                <th>Полка</th>
+                <th>Продукт</th>
+                <th>Тип продукции</th>
+                <th>Количество</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product_location in product_locations %}
+            <tr>
+                <td>{{ product_location.shelf_location.location }}</td>
+                <td>{{ product_location.shelf_location.shelf }}</td>
+                <td>{{ product_location.product.name }}</td>
+                <td>{{ product_location.product.product_type }}</td>
+                <td>{{ product_location.product.quantity }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Нет данных о размещении</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+

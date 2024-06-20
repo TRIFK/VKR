@@ -1,0 +1,19 @@
+<header>
+{% load static %}
+    <script src="{% static 'scripts/clock.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'styles/header.css' %}">
+    <div class="header-left">
+        <h1>Система склада Маркетинг-Юг</h1>
+    </div>
+    <div class="header-right">
+    <span id="current-time"></span>
+        {% if user.is_authenticated %}
+            <span>Здравствуйте, {{ user.username }} ({{ user.groups.first.name }})</span>
+        <a href="{% url 'logout' %}">
+            <img src="{% static 'images/exit.svg' %}" alt="Выход">
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}">Войти</a>
+        {% endif %}
+    </div>
+</header>

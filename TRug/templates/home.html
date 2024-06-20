@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% load static %}
+{% load group_tags %}
+
+<head>
+    <link rel="shortcut icon" type="image/x-icon" href={% static "images/power-off.png" %}>
+    <meta charset="UTF-8">
+    <title>{% block title %}TRUG{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'styles/home.css' %}">
+    <title>TRUG</title>
+    <script src="{% static 'scripts/clock.js' %}"></script>
+</head>
+<body>
+
+{% include 'header.html' %}
+
+<div class="main-container">
+    <aside class="sidebar">
+        <ul class="menu">
+
+        {% if user|has_group:"Кладовщик" %}
+            <li>
+                <a href="{% url 'home' %}" class="icon-button">
+                    <img src="{% static 'images/home.svg' %}" alt="Главная">
+                    <span>Главная</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'products' %}" class="icon-button">
+                    <img src="{% static 'images/boxes.svg' %}" alt="Продукция">
+                    <span>Продукция</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'supplies' %}" class="icon-button">
+                    <img src="{% static 'images/delivery.svg' %}" alt="Поставки">
+                    <span>Поставки</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'placement' %}" class="icon-button">
+                    <img src="{% static 'images/place.svg' %}" alt="Размещение">
+                    <span>Размещение</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% if user|has_group:"Грузчик" %}
+            <li>
+                <a href="{% url 'home' %}" class="icon-button">
+                    <img src="{% static 'images/home.svg' %}" alt="Главная">
+                    <span>Главная</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'placement' %}" class="icon-button">
+                    <img src="{% static 'images/place.svg' %}" alt="Размещение">
+                    <span>Размещение</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'shipment' %}" class="icon-button">
+                    <img src="{% static 'images/truck.svg' %}" alt="Отгрузка">
+                    <span>Отгрузка</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'orders' %}" class="icon-button">
+                    <img src="{% static 'images/order.svg' %}" alt="Заказы">
+                    <span>Заказы</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% if user|has_group:"Администратор" %}
+            <li>
+                <a href="{% url 'home' %}" class="icon-button">
+                    <img src="{% static 'images/home.svg' %}" alt="Главная">
+                    <span>Главная</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'products' %}" class="icon-button">
+                    <img src="{% static 'images/boxes.svg' %}" alt="Продукция">
+                    <span>Продукция</span>
+                </a>
+            </li>
+           <li>
+                <a href="{% url 'placement' %}" class="icon-button">
+                    <img src="{% static 'images/place.svg' %}" alt="Размещение">
+                    <span>Размещение</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'supplies' %}" class="icon-button">
+                    <img src="{% static 'images/delivery.svg' %}" alt="Поставки">
+                    <span>Поставки</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'shipment' %}" class="icon-button">
+                    <img src="{% static 'images/truck.svg' %}" alt="Отгрузка">
+                    <span>Отгрузка</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'orders' %}" class="icon-button">
+                    <img src="{% static 'images/order.svg' %}" alt="Заказы">
+                    <span>Заказы</span>
+                </a>
+            </li>
+        {% endif %}
+        </ul>
+    </aside>
+
+    <main class="content" id="content">
+        {% block content %}
+        <h2>Добро пожаловать на главную страницу!</h2>
+
+        <div class="delivery-info">
+            <p>Ближайшая отгрузка: {{ nearest_shipment_date }}</p>
+            {% if not nearest_shipment_date %}
+                <p>Нет данных о ближайшей отгрузке.</p>
+            {% endif %}
+        </div>
+
+        {% endblock %}
+    </main>
+</div>
+</body>
+</html>

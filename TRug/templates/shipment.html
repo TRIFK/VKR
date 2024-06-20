@@ -1,0 +1,43 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Отгрузки{% endblock %}
+
+{% block content %}
+<h2>Отгрузки</h2>
+<table class="shipment-table">
+<thead>
+<tr>
+    <th>Клиент</th>
+    <th>Продукты</th>
+    <th>Количество продуктов</th>
+    <th>Общее количество</th>
+    <th>Дата отгрузки</th>
+</tr>
+</thead>
+<tbody>
+{% for shipment in shipments %}
+<tr>
+    <td>{{ shipment.customer }}</td>
+    <td class="text2">
+        {% for shipment_product in shipment_products.all %}
+            <p> {{ shipment_product.product.name }} </p>
+        {% endfor %}
+    </td>
+
+    <td class="text2">
+        {% for shipment_product in shipment_products.all %}
+            <p> {{ shipment_product.quantity }} </p>
+        {% endfor %}
+    </td>
+    <td>{{ shipment.quantity }}</td>
+    <td>{{ shipment.date_shipped }}</td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="5">Нет данных об отгрузках</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
