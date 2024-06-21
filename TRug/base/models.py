@@ -83,7 +83,6 @@ class Supply(models.Model):
 class Shipment(models.Model):
     customer = models.CharField(max_length=100)
     products = models.ManyToManyField(ShipmentProduct, related_name='shipment')
-    quantity = models.IntegerField()
     date_shipped = models.DateField()
 
     def __str__(self):

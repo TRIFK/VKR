@@ -8,29 +8,28 @@
 <table class="shipment-table">
 <thead>
 <tr>
+    <th>Выбрать</th>
     <th>Клиент</th>
     <th>Продукты</th>
     <th>Количество продуктов</th>
-    <th>Общее количество</th>
     <th>Дата отгрузки</th>
 </tr>
 </thead>
 <tbody>
 {% for shipment in shipments %}
 <tr>
+    <td style="text-align: center;"><input type="checkbox" class="checkbox-custom" name="selected_order" value="{{ shipment.id }}"></td>
     <td>{{ shipment.customer }}</td>
     <td class="text2">
-        {% for shipment_product in shipment_products.all %}
-            <p> {{ shipment_product.product.name }} </p>
+        {% for shipment_product in shipment.products.all %}
+            <p>{{ shipment_product.product.name }}</p>
         {% endfor %}
     </td>
-
     <td class="text2">
-        {% for shipment_product in shipment_products.all %}
-            <p> {{ shipment_product.quantity }} </p>
+        {% for shipment_product in shipment.products.all %}
+            <p>{{ shipment_product.quantity }}</p>
         {% endfor %}
     </td>
-    <td>{{ shipment.quantity }}</td>
     <td>{{ shipment.date_shipped }}</td>
 </tr>
 {% empty %}

@@ -449,32 +449,63 @@ h2 {
 }
 
 
-     /* Стилизация внешнего вида чекбокса */
-    .checkbox-custom {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-color: #eee;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        position: relative;
-        vertical-align: middle; /* Выравнивание по вертикали по середине */
-    }
+ /* Стилизация внешнего вида чекбокса */
+.checkbox-custom {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    position: relative;
+    vertical-align: middle; /* Выравнивание по вертикали по середине */
+}
 
-    /* Внутренний элемент для обозначения состояния чекбокса */
-    .checkbox-inner {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 12px; /* Размер галочки */
-        height: 12px; /* Размер галочки */
-        background-color: #007bff; /* Цвет фона при отмеченном чекбоксе */
-        border-radius: 2px; /* Скругление углов */
-        display: none; /* Изначально скрыто */
-    }
+/* Внутренний элемент для обозначения состояния чекбокса */
+.checkbox-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px; /* Размер галочки */
+    height: 12px; /* Размер галочки */
+    background-color: #007bff; /* Цвет фона при отмеченном чекбоксе */
+    border-radius: 2px; /* Скругление углов */
+    display: none; /* Изначально скрыто */
+}
 
-    /* Показываем галочку при отмеченном состоянии */
-    .checkbox-custom input[type="checkbox"]:checked + .checkbox-inner {
-        display: block;
-    }
+/* Показываем галочку при отмеченном состоянии */
+.checkbox-custom input[type="checkbox"]:checked + .checkbox-inner {
+    display: block;
+}
+
+.shipment-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+}
+.shipment-table thead tr {
+    background-color: #f2f2f2;
+    color: #333;
+}
+.shipment-table th, .shipment-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+.shipment-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.shipment-table tr:hover {
+    background-color: #f1f1f1;
+}
+.shipment-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #F2F2F2;
+    color: black;
+}
+.text2 {
+    white-space: nowrap;
+}

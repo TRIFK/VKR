@@ -25,6 +25,10 @@
         <img src="{% static 'images/excel.svg' %}" alt="Сформировать накладную">
          <span class="button-label">Сформировать накладную</span>
     </a>
+    <button id="share-order-button" class="icon-button" onclick="shareSelectedOrder()">
+        <img src="{% static 'images/truck.svg' %}" alt="Передать в отгрузку">
+        <span class="button-label">Передать в отгрузку</span>
+    </button>
 </div>
 
 <table class="order-table" id = order-table>

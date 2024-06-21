@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addEditProductButton = document.getElementById('add-edit-product');
     const saveEditOrderButton = document.getElementById('save-edit-order');
     const cancelEditOrderButton = document.getElementById('cancel-edit-order');
+    const shareOrderButton = document.getElementById('share-order-button');
 
         //Открытие окна добавления заказа
      addOrderButton.addEventListener('click', function() {
@@ -168,6 +169,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+//Передать в отгрузку
+function shareSelectedOrder() {
+    var checkbox = document.querySelector('input[name="selected_order"]:checked');
+    if (!checkbox) {
+        showAlert("Выберите заказ для отгрузки");
+        return;
+    }
+
+    var order_id = checkbox.value;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch(`/shareOrder/${order_id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            },
+        })
+    .then(response => response.text())
+    .catch(error => console.error('Ошибка при предачи заказа в отгрузку:', error));
+}
 
 // Обработчик удаления заказа
 function deleteSelectedOrders() {

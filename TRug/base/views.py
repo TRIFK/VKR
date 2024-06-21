@@ -16,6 +16,8 @@ from .forms import OrderForm
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
+from datetime import timedelta
+from django.utils import timezone
 
 
 
@@ -313,3 +315,17 @@ def edit_order(request):
     else:
         return JsonResponse({'success': False, 'message': 'Неправильный тип запроса'}, status=400)
 
+def shareOrder(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    customer = order.customer
+    order_products = order.products.all()
+    products_ids = []
+    for product in order_products:
+        shipment = ShipmentProduct.objects.create(product_id=product.product.id, quantity=product.quantity)
+        products_ids.append(shipment.id)
+    products = ShipmentProduct.objects.filter(id__in=products_ids)
+    shipment_instance = Shipment.objects.create(customer=customer, date_shipped=timezone.now() + timedelta(days=3))
+    shipment_instance.products.set(products)
+    shipment_instance.save()
+
+    return JsonResponse({"Status": 200})
