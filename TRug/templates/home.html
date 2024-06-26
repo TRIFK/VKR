@@ -112,6 +112,28 @@
                 </a>
             </li>
         {% endif %}
+
+          {% if user|has_group:"Оператор" %}
+            <li>
+                <a href="{% url 'home' %}" class="icon-button">
+                    <img src="{% static 'images/home.svg' %}" alt="Главная">
+                    <span>Главная</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'products' %}" class="icon-button">
+                    <img src="{% static 'images/boxes.svg' %}" alt="Продукция">
+                    <span>Продукция</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'orders' %}" class="icon-button">
+                    <img src="{% static 'images/order.svg' %}" alt="Заказы">
+                    <span>Заказы</span>
+                </a>
+            </li>
+        {% endif %}
+
         </ul>
     </aside>
 

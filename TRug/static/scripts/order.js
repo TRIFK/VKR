@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showPopup('Заказ успешно добавлен!');
                 addOrderForm.reset();
                 addOrderModal.style.display = 'none';
-                updateOrdersTable(); // Вызываем функцию обновления таблицы
+                location.reload();
             } else {
                 console.error(data.error);
                 showPopup(`Ошибка: ${data.error}`);
