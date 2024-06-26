@@ -5,10 +5,13 @@ from .forms import RegistrationForm
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Product, ProductLocation, Supply, SupplyProduct, Shipment, ShipmentProduct, Order, OrderProduct, ProductType
 from django.http import JsonResponse
-from django.http import HttpResponse
-from openpyxl import Workbook
 from datetime import date
-from django.shortcuts import render
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.drawing.image import Image as OpenpyxlImage
+from io import BytesIO
+import qrcode
+from django.http import HttpResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.core.cache import cache
 from django.contrib import messages
@@ -39,8 +42,6 @@ def auth(request):
                 return redirect('home')
             else:
                 return render(request, 'auth.html', {'form': form, 'error': 'Неверные учетные данные'})
-        else:
-            return render(request, 'auth.html', {'form': form, 'error': 'Неверные учетные данные'})
     else:
         form = AuthenticationForm()
     return render(request, 'auth.html', {'form': form})
@@ -142,9 +143,20 @@ def shipment(request):
     return render(request, 'shipment.html', context)
 
 
-def generate_invoice(request):
-    # Fetch all orders
-    orders = Order.objects.all()
+
+def generate_invoice(request, order_id=0):
+    # Handle form submission if method is POST
+    if request.method == 'POST':
+        selected_orders_ids = request.POST.getlist('orders.id')
+
+        if not selected_orders_ids:
+            # Redirect or display an error message if no orders are selected
+            return redirect('orders')  # Replace with your URL name for orders list
+
+        orders = Order.objects.filter(id__in=selected_orders_ids)
+    else:
+        # Fetch all orders if no orders are selected (GET request)
+        orders = Order.objects.all()
 
     # Create a new Excel workbook and select the active sheet
     wb = Workbook()
@@ -152,11 +164,21 @@ def generate_invoice(request):
     ws.title = 'Заказ'
 
     # Define headers for the Excel sheet
-    headers = ['Клиент', 'Продукция', 'Сумма заказа', 'Дата заказа']
+    headers = ['Клиент', 'Продукция', 'Сумма заказа', 'Дата заказа', 'QR код']
 
-    # Write headers into the first row of the sheet
+    # Define styles
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
+    header_alignment = Alignment(horizontal="center", vertical="center")
+    data_font = Font(bold=False, color="000000")
+    data_alignment = Alignment(horizontal="left", vertical="center")
+
+    # Write headers into the first row of the sheet and apply styles
     for col_num, header in enumerate(headers, 1):
-        ws.cell(row=1, column=col_num, value=header)
+        cell = ws.cell(row=1, column=col_num, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = header_alignment
 
     # Write order data into subsequent rows
     for row_num, order in enumerate(orders, 2):  # Start from row 2 for data rows
@@ -164,17 +186,49 @@ def generate_invoice(request):
         data = [order.customer, products_list, order.summary, order.date_ordered]
 
         for col_num, value in enumerate(data, 1):
-            ws.cell(row=row_num, column=col_num, value=value)
+            cell = ws.cell(row=row_num, column=col_num, value=value)
+            cell.font = data_font
+            cell.alignment = data_alignment
+
+        # Generate a QR code for the order
+        qr_data = f"Order ID: {order.id}, Customer: {order.customer}, Summary: {order.summary}"
+        qr_img = qrcode.make(qr_data)
+
+        # Save the QR code image to a BytesIO object
+        qr_bytes = BytesIO()
+        qr_img.save(qr_bytes)
+        qr_bytes.seek(0)
+
+        # Load the QR code image into an openpyxl image object
+        qr_image = OpenpyxlImage(qr_bytes)
+        qr_image.width = 100  # Set the width of the QR code image
+        qr_image.height = 100  # Set the height of the QR code image
+
+        # Add the QR code image to the worksheet
+        ws.add_image(qr_image, f'E{row_num}')
+
+    # Adjust column widths
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column_letter  # Get the column name
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2)
+        ws.column_dimensions[column].width = adjusted_width
 
     # Save the Excel file to a BytesIO object
-    from io import BytesIO
     excel_file = BytesIO()
     wb.save(excel_file)
     excel_file.seek(0)
 
     # Set up the HTTP response
     response = HttpResponse(excel_file.read(), content_type='application/vnd.openpyxl.sheet')
-    response['Content-Disposition'] = 'attachment; filename=orders.xlsx'
+    filename = 'selected_orders.xlsx'
+    response['Content-Disposition'] = f'attachment; filename={filename}'
 
     return response
 
@@ -238,6 +292,7 @@ def create_order(request):
 
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
 
 
 @csrf_exempt
@@ -323,9 +378,9 @@ def shareOrder(request, order_id):
     for product in order_products:
         shipment = ShipmentProduct.objects.create(product_id=product.product.id, quantity=product.quantity)
         products_ids.append(shipment.id)
-    products = ShipmentProduct.objects.filter(id__in=products_ids)
-    shipment_instance = Shipment.objects.create(customer=customer, date_shipped=timezone.now() + timedelta(days=3))
-    shipment_instance.products.set(products)
-    shipment_instance.save()
+        products = ShipmentProduct.objects.filter(id__in=products_ids)
+        shipment_instance = Shipment.objects.create(customer=customer, date_shipped=timezone.now() + timedelta(days=3))
+        shipment_instance.products.set(products)
+        shipment_instance.save()
 
     return JsonResponse({"Status": 200})
