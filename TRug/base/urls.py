@@ -18,4 +18,5 @@ urlpatterns = [
     path('edit_order/', views.edit_order, name='edit_order'),
     path('generate_invoice/', views.generate_invoice, name='generate_invoice'),
     path('shareOrder/<int:order_id>', views.shareOrder, name='shareOrder'),
+    path('complete_shipment/', views.complete_shipment, name='complete_shipment'),
 ]

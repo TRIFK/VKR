@@ -315,6 +315,47 @@ def edit_order(request):
     else:
         return JsonResponse({'success': False, 'message': 'Неправильный тип запроса'}, status=400)
 
+
+@require_POST
+def complete_shipment(request):
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        data = json.loads(request.body)
+        shipment_id = data.get('shipment_id')
+
+        try:
+            shipment = Shipment.objects.get(id=shipment_id)
+        except Shipment.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Shipment not found'}, status=404)
+
+        # Получение списка id продуктов из отгрузки
+        product_ids = shipment.products.values_list('product__id', flat=True)
+
+        print(f"Отгрузка ID: {shipment_id}")
+        print(f"Клиент: {shipment.customer}")
+        print(f"Дата отгрузки: {shipment.date_shipped}")
+        print(f"ID продуктов: {list(product_ids)}")
+
+        # Фильтрация заказов по клиенту и дате
+        orders = Order.objects.filter(
+            customer=shipment.customer,
+        ).distinct()
+        for order in orders:
+            orderProductsIds = list(order.products.values_list('product__id', flat=True))
+            print(orderProductsIds == list(product_ids))
+            if orderProductsIds == list(product_ids):
+                order.completed = True
+                order.save()
+                break
+            else:
+                print("Не было найдено совпадений")
+                return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+        return JsonResponse({'success': True}, status=200)
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+
+
 def shareOrder(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     customer = order.customer

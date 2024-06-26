@@ -4,6 +4,8 @@
 {% block title %}Отгрузки{% endblock %}
 
 {% block content %}
+<script src="{% static 'scripts/shipment.js' %}"></script>
+
 <h2>Отгрузки</h2>
 <table class="shipment-table">
 <thead>
@@ -16,9 +18,13 @@
 </tr>
 </thead>
 <tbody>
+<button id="complete-shipment-button" class="icon-button">
+    <img src="{% static 'images/check.svg' %}" alt="Подтвердить отгрузку">
+    <span class="button-label">Подтвердить отгрузку</span>
+</button>
 {% for shipment in shipments %}
 <tr>
-    <td style="text-align: center;"><input type="checkbox" class="checkbox-custom" name="selected_order" value="{{ shipment.id }}"></td>
+    <td style="text-align: center;"><input type="checkbox" class="checkbox-custom" name="selected_shipment" value="{{ shipment.id }}"></td>
     <td>{{ shipment.customer }}</td>
     <td class="text2">
         {% for shipment_product in shipment.products.all %}
@@ -37,6 +43,7 @@
     <td colspan="5">Нет данных об отгрузках</td>
 </tr>
 {% endfor %}
+{% csrf_token %}
 </tbody>
 </table>
 {% endblock %}
